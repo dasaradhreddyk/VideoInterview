@@ -1,37 +1,72 @@
-# Node.js with React
-# Build a Node.js project that uses React.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+# Azure DevOps YAML pipeline
+# File part 1
  
 trigger:
-- master
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - 'src/MyProjectRootFolder/*'
+ 
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - '*'
+  paths:
+    include:
+      - 'src/MyProjectRootFolder/*'
  
 pool:
-  vmImage: 'windows-latest'
-
-# Set variables
-variables:
-  directory: VideoInterview
-  stage: development
-  appServiceName: reactazuredemo
+  vmImage: windows-latest
  
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
-   
-- task: Npm@1
-  inputs:
-   command: 'install'
+variables:
+- name: WebProjectRoot
+  value: src/MyProjectRootFolder
 
-- task: Npm@1
-  inputs:
-    command: 'custom'
-    customCommand: 'run build'
-  
-- task: PublishBuildArtifacts@1
-  inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'drop'
-      publishLocation: 'Container'
+stages:
+- stage: BuildStage
+  displayName: 'Build, Test, and Publish'
+  jobs:
+    - job: BuildJob
+      steps:
+        - task: CmdLine@2
+          name: Install
+          displayName: Install Packages
+          inputs:
+            script: 'npm install'
+            workingDirectory: '$(WebProjectRoot)'
+            failOnStderr: false
+ 
+        - task: CmdLine@2
+          name: BuildDev
+          displayName: Create Build Artifact (Dev)
+          inputs:
+            script: 'npm run-script build:development'
+            workingDirectory: '$(WebProjectRoot)'
+            failOnStderr: true
+ 
+        - task: ArchiveFiles@2
+          name: ZipArtifactsDev
+          displayName: Zip and Copy to Staging (Dev)
+          inputs:
+            rootFolderOrFile: '$(WebProjectRoot)/build'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/deployment.development.zip'
+            includeRootFolder: false
+ 
+        - task: CmdLine@2
+          name: Test
+          displayName: Run Unit Test Suite
+          inputs:
+            script: 'npm test'
+            workingDirectory: '$(WebProjectRoot)'
+            failOnStderr: false
+ 
+        - task: PublishBuildArtifacts@1
+          name: Publish
+          displayName: Publish Zip Artifact
+          condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/main'))
+          inputs:
+            pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'WebDrop'
