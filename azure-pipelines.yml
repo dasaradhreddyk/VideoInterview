@@ -11,7 +11,7 @@ pool:
 
 # Set variables
 variables:
-  directory: src
+  directory: ./../src
   stage: development
   appServiceName: reactazuredemo
  
