@@ -11,7 +11,7 @@ pool:
 
 # Set variables
 variables:
-  directory: interview
+  directory: VideoInterview
   stage: development
   appServiceName: reactazuredemo
  
