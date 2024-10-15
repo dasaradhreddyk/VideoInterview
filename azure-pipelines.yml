@@ -17,7 +17,7 @@ steps:
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: 'dist' # Assuming 'dist' is your build output folder
+    rootFolderOrFile: 'build' # Assuming 'dist' is your build output folder
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/build.zip' # Define the path for the zip file
