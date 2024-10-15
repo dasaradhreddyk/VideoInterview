@@ -20,7 +20,7 @@ steps:
     rootFolderOrFile: 'dist' # Assuming 'dist' is your build output folder
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/dist.zip' # Define the path for the zip file
+    archiveFile: '$(Build.ArtifactStagingDirectory)/build.zip' # Define the path for the zip file
     replaceExistingArchive: true
 
 - task: CopyFiles@2
