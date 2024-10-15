@@ -15,21 +15,8 @@ steps:
     npm run build
   displayName: 'npm install and build'
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'build' # Assuming 'dist' is your build output folder
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/build.zip' # Define the path for the zip file
-    replaceExistingArchive: true
-
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(Build.ArtifactStagingDirectory)'
-    Contents: '**/*.zip' # Assuming you want to copy all zip files
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/drop'
-
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
+    PathtoPublish: 'build'
     ArtifactName: 'drop'
+    publishLocation: 'Container'
