@@ -4,69 +4,16 @@
 trigger:
   branches:
     include:
-      - main
-  paths:
-    include:
-      - 'src/MyProjectRootFolder/*'
- 
-pr:
-  autoCancel: true
-  branches:
-    include:
-      - '*'
-  paths:
-    include:
-      - 'src/MyProjectRootFolder/*'
- 
-pool:
-  vmImage: windows-latest
- 
-variables:
-- name: WebProjectRoot
-  value: src/MyProjectRootFolder
+      - main  # Replace with your main branch name
 
-stages:
-- stage: BuildStage
-  displayName: 'Build, Test, and Publish'
-  jobs:
-    - job: BuildJob
-      steps:
-        - task: CmdLine@2
-          name: Install
-          displayName: Install Packages
-          inputs:
-            script: 'npm install'
-            workingDirectory: '$(WebProjectRoot)'
-            failOnStderr: false
- 
-        - task: CmdLine@2
-          name: BuildDev
-          displayName: Create Build Artifact (Dev)
-          inputs:
-            script: 'npm run-script build:development'
-            workingDirectory: '$(WebProjectRoot)'
-            failOnStderr: true
- 
-        - task: ArchiveFiles@2
-          name: ZipArtifactsDev
-          displayName: Zip and Copy to Staging (Dev)
-          inputs:
-            rootFolderOrFile: '$(WebProjectRoot)/build'
-            archiveFile: '$(Build.ArtifactStagingDirectory)/deployment.development.zip'
-            includeRootFolder: false
- 
-        - task: CmdLine@2
-          name: Test
-          displayName: Run Unit Test Suite
-          inputs:
-            script: 'npm test'
-            workingDirectory: '$(WebProjectRoot)'
-            failOnStderr: false
- 
-        - task: PublishBuildArtifacts@1
-          name: Publish
-          displayName: Publish Zip Artifact
-          condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/main'))
-          inputs:
-            pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-            ArtifactName: 'WebDrop'
+pool:
+  vmImage: 'ubuntu-latest'
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '14.x'
+  displayName: 'Install Node.js'
+- script: |
+    npm install
+    npm run build
+  displayName: 'Install Dependencies and Build'
