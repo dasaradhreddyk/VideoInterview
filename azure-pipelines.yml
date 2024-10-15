@@ -12,7 +12,7 @@ steps:
 
 - script: |
     npm install
-    npm run dev
+    npm run build
   displayName: 'npm install and build'
 
 - task: ArchiveFiles@2
@@ -29,6 +29,11 @@ steps:
     Contents: '**/*.zip' # Assuming you want to copy all zip files
     TargetFolder: '$(Build.ArtifactStagingDirectory)/drop'
 
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
