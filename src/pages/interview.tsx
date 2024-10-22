@@ -31,7 +31,6 @@ async function getQeustion() {
       // questions.push(data[0].name);
       if (questions.length < 3) {
         questions.push(data[1].name);
-
         questions.push(data[2].name);
         questions.push(data[3].name);
       }

@@ -29,7 +29,7 @@ export default function Home() {
       setSubmitting(true);
 
       try {
-        
+
         // const res = await fetch('/api/meeting', {
         //   method: 'POST',
         //   headers: {
@@ -38,18 +38,60 @@ export default function Home() {
         //   body: JSON.stringify(form),
         // });
 
-        // const data = await res.json();
+        const API_KEY = "fb880bc345b5197637c8";
+        const ORG_ID = "6624c0e4-88e9-46d2-89f2-747c935f927d";
 
-        // if (!res.ok) {
-        //   alert(
-        //     'There was an error when starting the interview, check console for error'
-        //   );
-        //   console.log(res.status, data);
-        //   return;
+        console.log("api keys " + API_KEY);
+        const BASIC_TOKEN = Buffer.from(ORG_ID + ':' + API_KEY).toString('base64');
+
+        const meetingResponse = await fetch(
+          'https://api.dyte.io/v2/meetings',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Basic ' + BASIC_TOKEN,
+            },
+            body: JSON.stringify({ title: 'Interview with ' + form.email, preferred_region: "ap-south-1", record_on_start: false, }),
+          }
+        );
+        console.log(meetingResponse.json);
+
+        const meetingData = await meetingResponse.json();
+
+        // if (!meetingResponse.ok) {
+        //   console.log("first error")
+        //   return res.status(meetingResponse.status).json(meetingData);
         // }
 
-        const { token } = {"token":'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjY2MjRjMGU0LTg4ZTktNDZkMi04OWYyLTc0N2M5MzVmOTI3ZCIsIm1lZXRpbmdJZCI6ImJiYjdlMTQyLTY2NTgtNDA0Ny04MTM3LTczMTAxMmI1MTg1YiIsInBhcnRpY2lwYW50SWQiOiJhYWE5MGM2YS00NDkyLTRmODktYTc1Zi01NWVmZThmZDFjMzciLCJwcmVzZXRJZCI6ImYzYjBjZTMxLTZmNjAtNDY4Yy04MjkzLTMyM2M1M2Y2MjkzZiIsImlhdCI6MTcyODQ3NzMzMSwiZXhwIjoxNzM3MTE3MzMxfQ.Pegw76BDg2KB5vuF1nSmtUNcphQx9RhH219iTMUr5lC-USslAuiD0SrH-RTwYBgIq5et7zzSaXODZ7tpJ-qVDb-S3qi1MbA3imyjFUBzfvPdoqRbLMFTVDsKrcdWPTxDXLsvVcb_D7LTsOp8iav68GCAYtyfG66csv11Aj1FWdP1EQjBSgcPdqxBeW2tN0L_qbxMk5B53E73pqQMFTwrYHQPQLsly3BdYxuY0wbROp7izV35c4iUZ5Sh1sQktyk_gha91nCpjiitJKZAiLQuBGKQTP_jV7T2Fp3Wqc-Rgl_cRJ8KVOfAtWY1NWskRcxMukGp2OTKeXgzETciXXaVbg'};
+        const { id } = meetingData.data;
 
+        const participantResponse = await fetch(
+          `https://api.cluster.dyte.in/v2/meetings/${id}/participants`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Basic ' + BASIC_TOKEN,
+            },
+            body: JSON.stringify({
+              name:form.name,
+              preset_name: 'group_call_host',
+              picture :  "https://i.imgur.com/test.jpg",
+              custom_participant_id: form.email,
+            }),
+          }
+        );
+
+        let response  = await participantResponse.json();
+        console.log("apiKey " + JSON.stringify(response.data.token));
+
+        const { token1 } = response.data;
+        console.log("token" + token1);
+
+
+       // const { token } = { "token": 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IjY2MjRjMGU0LTg4ZTktNDZkMi04OWYyLTc0N2M5MzVmOTI3ZCIsIm1lZXRpbmdJZCI6ImJiYjdlMTQyLTY2NTgtNDA0Ny04MTM3LTczMTAxMmI1MTg1YiIsInBhcnRpY2lwYW50SWQiOiJhYWE5MGM2YS00NDkyLTRmODktYTc1Zi01NWVmZThmZDFjMzciLCJwcmVzZXRJZCI6ImYzYjBjZTMxLTZmNjAtNDY4Yy04MjkzLTMyM2M1M2Y2MjkzZiIsImlhdCI6MTcyODQ3NzMzMSwiZXhwIjoxNzM3MTE3MzMxfQ.Pegw76BDg2KB5vuF1nSmtUNcphQx9RhH219iTMUr5lC-USslAuiD0SrH-RTwYBgIq5et7zzSaXODZ7tpJ-qVDb-S3qi1MbA3imyjFUBzfvPdoqRbLMFTVDsKrcdWPTxDXLsvVcb_D7LTsOp8iav68GCAYtyfG66csv11Aj1FWdP1EQjBSgcPdqxBeW2tN0L_qbxMk5B53E73pqQMFTwrYHQPQLsly3BdYxuY0wbROp7izV35c4iUZ5Sh1sQktyk_gha91nCpjiitJKZAiLQuBGKQTP_jV7T2Fp3Wqc-Rgl_cRJ8KVOfAtWY1NWskRcxMukGp2OTKeXgzETciXXaVbg' };
+       const { token } = { "token": response.data.token}
         router.push({
           pathname: '/interview',
           query: {

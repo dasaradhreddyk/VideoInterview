@@ -10,14 +10,18 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== 'POST') {
-    return res
-      .status(405)
-      .json({ success: false, message: 'Method Not Allowed' });
-  }
+  // if (req.method !== 'POST') {
+  //   return res
+  //     .status(405)
+  //     .json({ success: false, message: 'Method Not Allowed' });
+  // }
 
-  const { name, email } = req.body;
+  //const { name, email } = req.body;
+  let name = "";
+  let email = "dasaradh@gmail.com"
+  digest: {};
 
+  console.log("api starting " )
   const meetingResponse = await fetch(
     'https://api.dyte.io/v2/meetings',
     {
@@ -26,13 +30,14 @@ export default async function handler(
         'Content-Type': 'application/json',
         Authorization: 'Basic ' + BASIC_TOKEN,
       },
-      body: JSON.stringify({ title: 'Interview with ' + name }),
+      body: JSON.stringify({ title: 'Interview with ' + name , preferred_region : "ap-south-1" ,record_on_start : false,}),
     }
   );
 
   const meetingData = await meetingResponse.json();
 
   if (!meetingResponse.ok) {
+    console.log("first error")
     return res.status(meetingResponse.status).json(meetingData);
   }
 
